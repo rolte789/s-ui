@@ -6,10 +6,10 @@ import (
 	"log"
 	"os"
 	"s-ui/config"
-	"s-ui/database"
 	"s-ui/database/model"
 	"strings"
 
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -21,11 +21,10 @@ func migrateDb() {
 		return
 	}
 
-	err = database.OpenDB(path)
+	db, err := gorm.Open(sqlite.Open(path))
 	if err != nil {
 		log.Fatal(err)
 	}
-	db := database.GetDB()
 	tx := db.Begin()
 	defer func() {
 		if err == nil {
@@ -78,15 +77,15 @@ func migrateClientSchema(db *gorm.DB) error {
 					switch cname {
 					case "inbounds":
 						inbounds := strings.Split(data.Data, ",")
-						newData, _ = json.MarshalIndent(inbounds, " ", "  ")
+						newData, _ = json.MarshalIndent(inbounds, "", "  ")
 					case "config":
 						jsonData := map[string]interface{}{}
 						json.Unmarshal([]byte(data.Data), &jsonData)
-						newData, _ = json.MarshalIndent(jsonData, " ", "  ")
+						newData, _ = json.MarshalIndent(jsonData, "", "  ")
 					case "links":
 						jsonData := make([]interface{}, 0)
 						json.Unmarshal([]byte(data.Data), &jsonData)
-						newData, _ = json.MarshalIndent(jsonData, " ", "  ")
+						newData, _ = json.MarshalIndent(jsonData, "", "  ")
 					}
 					err = db.Model(model.Client{}).Where("id = ?", data.Id).UpdateColumn(cname, newData).Error
 					if err != nil {

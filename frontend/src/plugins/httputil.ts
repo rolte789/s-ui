@@ -57,7 +57,7 @@ function _respToMsg(resp: any): Msg {
 }
 
 function isMsg(obj: any): obj is Msg {
-  return 'success' in obj && 'msg' in obj && 'obj' in obj
+  return Object.hasOwn(obj,'success') && Object.hasOwn(obj,'msg') && Object.hasOwn(obj, 'obj')
 }
   
 const HttpUtils = {
@@ -85,4 +85,4 @@ const HttpUtils = {
   },
 }
 
-export default HttpUtils;
+export default HttpUtils

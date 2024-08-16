@@ -85,10 +85,11 @@
 import TlsVue from '@/layouts/modals/Tls.vue'
 import Data from '@/store/modules/data'
 import { computed, ref } from 'vue'
-import { Config } from '@/types/config';
-import { Inbound } from '@/types/inbounds';
-import { Client } from '@/types/clients';
-import { Link, LinkUtil } from '@/plugins/link';
+import { Config } from '@/types/config'
+import { Inbound } from '@/types/inbounds'
+import { Client } from '@/types/clients'
+import { Link, LinkUtil } from '@/plugins/link'
+import { fillData } from '@/plugins/outJson'
 
 const tlsConfigs = computed((): any[] => {
   return Data().tlsConfigs
@@ -96,6 +97,10 @@ const tlsConfigs = computed((): any[] => {
 
 const inbounds = computed((): any[] => {
   return <any[]>(<Config>Data().config)?.inbounds
+})
+
+const inData = computed((): any[] => {
+  return <any[]> Data().inData
 })
 
 const clients = computed((): any[] => {
@@ -135,6 +140,7 @@ const saveModal = (data:any) => {
     tlsConfigs.value[modal.value.index] = data
     inbounds?.value.filter(i => tlsConfigs.value[modal.value.index].inbounds.includes(i.tag)).forEach(i =>{
       if (i.tls != undefined) i.tls = data.server
+      updateInData(i,data.client)
       updateLinks(i,data.client)
     })
   }
@@ -150,28 +156,33 @@ const delTls = (index: number) => {
 }
 
 const updateLinks = (i:any,tlsClient:any) => {
-  if(i.users && i.users.length>0){
-    i.users.forEach((u:any) => {
-      const client = clients.value.find(c => u.username? c.name == u.username : c.name == u.name)
-      if (client){
-        const clientInbounds = <Inbound[]>inbounds.value.filter(inb => client?.inbounds.includes(inb.tag))
-        const newLinks = <Link[]>[]
-        clientInbounds.forEach(i =>{
-          const cData = <any>Data().inData?.findLast((d:any) => d.tag == i.tag)
-          const addrs = cData ? <any[]>cData.addrs : []
-          const uris = LinkUtil.linkGenerator(client,i, tlsClient, addrs)
-          if (uris.length>0){
-            uris.forEach(uri => {
-              newLinks.push(<Link>{ type: 'local', remark: i.tag, uri: uri })
-            })
-          }
-        })
-        let links = client.links && client.links.length>0? client.links : <Link[]>[]
-        links = [...newLinks, ...links.filter((l:Link) => l.type != 'local')]
+  if(i.users){
+    const uClients = clients.value.filter(c => c.inbounds.includes(i.tag))
+    uClients.forEach((client:any) => {
+      const clientInbounds = <Inbound[]>inbounds.value.filter(inb => client?.inbounds.includes(inb.tag))
+      const newLinks = <Link[]>[]
+      clientInbounds.forEach(i =>{
+        const cData = <any>Data().inData?.findLast((d:any) => d.tag == i.tag)
+        const addrs = cData ? <any[]>cData.addrs : []
+        const uris = LinkUtil.linkGenerator(client,i, tlsClient, addrs)
+        if (uris.length>0){
+          uris.forEach(uri => {
+            newLinks.push(<Link>{ type: 'local', remark: i.tag, uri: uri })
+          })
+        }
+      })
+      let links = client.links && client.links.length>0? client.links : <Link[]>[]
+      links = [...newLinks, ...links.filter((l:Link) => l.type != 'local')]
 
-        client.links = links
-      }
+      client.links = links
     })
+  }
+}
+
+const updateInData = (i:any, c:any) => {
+  const inDataIndex = inData.value.findIndex(d => d.tag == i.tag)
+  if (inDataIndex != -1) {
+    fillData(inData.value[inDataIndex].outJson, i, c)
   }
 }
 </script>
