@@ -103,6 +103,7 @@ export default {
     disable: "禁用",
     close: "关闭",
     restartApp: "重启面板",
+    restartSb: "重启 Singbox",
   },
   login: {
     title: "登录",
@@ -153,6 +154,7 @@ export default {
     directDns: "直连 DNS",
     toDirectDns: "路由到直连 DNS",
     jsonSubOptions: "其他选项",
+    excludePkg: "排除包",
   },
   client: {
     name: "名称",
@@ -164,6 +166,11 @@ export default {
     links: "链接",
     external: "外部链接",
     sub: "外部订阅",
+  },
+  bulk: {
+    add: "批量添加",
+    order: "排序",
+    random: "随机",
   },
   types: {
     un: "用户名",
@@ -199,6 +206,10 @@ export default {
       congControl: "拥塞控制",
       authTimeout: "认证超时",
       hb: "心跳包",
+    },
+    tun: {
+      addr: "地址",
+      ifName: "接口名称",
     },
     vless: {
       flow: "流控",

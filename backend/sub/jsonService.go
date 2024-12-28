@@ -14,7 +14,10 @@ const defaultJson = `
   "inbounds": [
     {
       "type": "tun",
-      "inet4_address": "172.19.0.1/30",
+      "address": [
+				"172.19.0.1/30",
+				"fdfe:dcba:9876::1/126"
+			],
       "mtu": 9000,
       "auto_route": true,
       "strict_route": false,
@@ -125,7 +128,7 @@ func (j *JsonService) getOutbounds(clientConfig json.RawMessage, inDatas *[]mode
 		protocol, _ := outbound["type"].(string)
 		config, _ := configs[protocol].(map[string]interface{})
 		for key, value := range config {
-			if key != "alterId" && key != "name" && key != "username" {
+			if key != "alterId" && key != "name" {
 				outbound[key] = value
 			}
 		}
@@ -135,10 +138,16 @@ func (j *JsonService) getOutbounds(clientConfig json.RawMessage, inDatas *[]mode
 		if err != nil {
 			return nil, nil, err
 		}
-		tag := outbound["tag"].(string)
+		tag, _ := outbound["tag"].(string)
 		if len(addrs) == 0 {
-			outTags = append(outTags, tag)
-			outbounds = append(outbounds, outbound)
+			// For mixed protocol, use separated socks and http
+			if protocol == "mixed" {
+				outbound["tag"] = tag
+				j.pushMixed(&outbounds, &outTags, outbound)
+			} else {
+				outTags = append(outTags, tag)
+				outbounds = append(outbounds, outbound)
+			}
 		} else {
 			for index, addr := range addrs {
 				// Copy original config
@@ -150,11 +159,34 @@ func (j *JsonService) getOutbounds(clientConfig json.RawMessage, inDatas *[]mode
 				newOut["server"], _ = addr["server"].(string)
 				port, _ := addr["server_port"].(float64)
 				newOut["server_port"] = int(port)
+
+				// Override TLS
+				newTls, overrideTls := addr["tls"].(bool)
+				if overrideTls {
+					tlsIf := map[string]interface{}{}
+					if newTls {
+						tlsIf["enabled"] = true
+						newSNI, overrideSNI := addr["server_name"].(string)
+						if overrideSNI {
+							tlsIf["server_name"] = newSNI
+						}
+						newInsecure, overrideInsecure := addr["insecure"].(bool)
+						if overrideInsecure {
+							tlsIf["insecure"] = newInsecure
+						}
+					}
+					newOut["tls"] = tlsIf
+				}
 				remark, _ := addr["remark"].(string)
 				newTag := fmt.Sprintf("%d.%s%s", index+1, tag, remark)
-				outTags = append(outTags, newTag)
 				newOut["tag"] = newTag
-				outbounds = append(outbounds, newOut)
+				// For mixed protocol, use separated socks and http
+				if protocol == "mixed" {
+					j.pushMixed(&outbounds, &outTags, newOut)
+				} else {
+					outTags = append(outTags, newTag)
+					outbounds = append(outbounds, newOut)
+				}
 			}
 		}
 	}
@@ -228,8 +260,11 @@ func (j *JsonService) addOthers(jsonConfig *map[string]interface{}) error {
 	if _, ok := othersJson["dns"]; ok {
 		(*jsonConfig)["dns"] = othersJson["dns"]
 	}
+	if _, ok := othersJson["inbounds"]; ok {
+		(*jsonConfig)["inbounds"] = othersJson["inbounds"]
+	}
 	if _, ok := othersJson["experimental"]; ok {
-		(*jsonConfig)["experimental"] = othersJson["lexperimentalog"]
+		(*jsonConfig)["experimental"] = othersJson["experimental"]
 	}
 	if _, ok := othersJson["rule_set"]; ok {
 		route["rule_set"] = othersJson["rule_set"]
@@ -240,4 +275,21 @@ func (j *JsonService) addOthers(jsonConfig *map[string]interface{}) error {
 	(*jsonConfig)["route"] = route
 
 	return nil
+}
+
+func (j *JsonService) pushMixed(outbounds *[]map[string]interface{}, outTags *[]string, out map[string]interface{}) {
+	socksOut := make(map[string]interface{}, 1)
+	httpOut := make(map[string]interface{}, 1)
+	for key, value := range out {
+		socksOut[key] = value
+		httpOut[key] = value
+	}
+	socksTag := fmt.Sprintf("%s-socks", out["tag"])
+	httpTag := fmt.Sprintf("%s-http", out["tag"])
+	socksOut["type"] = "socks"
+	httpOut["type"] = "http"
+	socksOut["tag"] = socksTag
+	httpOut["tag"] = httpTag
+	*outbounds = append(*outbounds, socksOut, httpOut)
+	*outTags = append(*outTags, socksTag, httpTag)
 }

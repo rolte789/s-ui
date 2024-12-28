@@ -27,12 +27,12 @@
 | Dark/Light Theme                       | :heavy_check_mark: |
 
 
-## Default Installation Informarion
+## Default Installation Information
 - Panel Port: 2095
 - Panel Path: /app/
 - Subscription Port: 2096
 - Subscription Path: /sub/
-- User/Passowrd: admin
+- User/Password: admin
 
 ## Install & Upgrade to Latest Version
 
@@ -40,17 +40,29 @@
 bash <(curl -Ls https://raw.githubusercontent.com/alireza0/s-ui/master/install.sh)
 ```
 
-## Install Custom Version
+## Install legacy Version
 
-**Step 1:** To install your desired version, add the version to the end of the installation command. e.g., ver `0.0.1`:
+**Step 1:** To install your desired legacy version, add the version to the end of the installation command. e.g., ver `1.0.0`:
 
 ```sh
-bash <(curl -Ls https://raw.githubusercontent.com/alireza0/s-ui/master/install.sh) 0.0.1
+VERSION=1.0.0 && bash <(curl -Ls https://raw.githubusercontent.com/alireza0/s-ui/$VERSION/install.sh) $VERSION
 ```
+
+## Manual installation
+
+1. Get the latest version of S-UI based on your OS/Architecture from GitHub: [https://github.com/alireza0/s-ui/releases/latest](https://github.com/alireza0/s-ui/releases/latest)
+2. **OPTIONAL** Get the latest version of `s-ui.sh` [https://raw.githubusercontent.com/alireza0/s-ui/master/s-ui.sh](https://raw.githubusercontent.com/alireza0/s-ui/master/s-ui.sh)
+3. **OPTIONAL** Copy `s-ui.sh` to /usr/bin/ and run `chmod +x /usr/bin/s-ui`.
+4. Extract s-ui tar.gz file to a directory of your choice and navigate to the directory where you extracted the tar.gz file.
+5. Copy *.service files to /etc/systemd/system/ and run `systemctl daemon-reload`.
+6. Enable autostart and start S-UI service using `systemctl enable s-ui --now`
+7. Start sing-box service using `systemctl enable sing-box --now`
 
 ## Uninstall S-UI
 
 ```sh
+sudo -i
+
 systemctl disable sing-box --now
 systemctl disable s-ui  --now
 
@@ -59,6 +71,8 @@ rm -f /etc/systemd/system/sing-box.service
 systemctl daemon-reload
 
 rm -fr /usr/local/s-ui
+rm /usr/bin/s-ui
+
 ```
 
 ## Install using Docker
@@ -80,7 +94,7 @@ curl -fsSL https://get.docker.com | sh
 
 ```shell
 mkdir s-ui && cd s-ui
-wget -q https://raw.githubusercontent.com/alireza0/s-ui/main/docker-compose.yml
+wget -q https://raw.githubusercontent.com/alireza0/s-ui/master/docker-compose.yml
 docker compose up -d
 ```
 
@@ -104,7 +118,7 @@ docker build -t s-ui .
 
 </details>
 
-## Manual run + contribution
+## Manual run ( contribution )
 
 <details>
    <summary>Click for details</summary>
@@ -118,14 +132,14 @@ docker build -t s-ui .
 
 Frontend codes are in `frontend` folder in the root of repository.
 
-To run it localy for instant developement you can use (apply automatic changes on file save):
+To run it locally for instant development you can use (apply automatic changes on file save):
 ```shell
 cd frontend
 npm run dev
 ```
 > By this command it will run a `vite` web server on separate port `3000`, with backend proxy to `http://localhost:2095`. You can change it in `frontend/vite.config.mts`.
 
-To build fronend:
+To build frontend:
 ```shell
 cd frontend
 npm run build
@@ -133,7 +147,7 @@ npm run build
 
 ### - Backend
 Backend codes are in `backend` folder in the root of repository.
-> Please build fronend once before!
+> Please build frontend once before!
 
 To build backend:
 ```shell
@@ -161,6 +175,7 @@ To run backend (from root folder of repository):
 - Vietnamese
 - Chinese (Simplified)
 - Chinese (Traditional)
+- Russian
 
 ## Features
 

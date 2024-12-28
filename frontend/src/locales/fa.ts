@@ -102,6 +102,7 @@ export default {
     disable: "غیرفعال",
     close: "بستن",
     restartApp: "ریستارت پنل",
+    restartSb: "ریستارت سینگ‌باکس",
   },
   login: {
     title: "ورود",
@@ -152,6 +153,7 @@ export default {
     directDns: "DNS مستقیم",
     toDirectDns: "هدایت به DNS مستقیم",
     jsonSubOptions: "گزینه‌های دیگر",
+    excludePkg: "نرم‌افزارهای استثنا",
   },
   client: {
     name: "نام",
@@ -163,6 +165,11 @@ export default {
     links: "لینک‌ها",
     external: "لینک‌ خارجی",
     sub: "سابسکریپشن خارجی",
+  },
+  bulk: {
+    add: "ایجاد انبوه",
+    order: "ترتیب",
+    random: "تصادفی",
   },
   types: {
     un: "نام کاربری",
@@ -198,6 +205,10 @@ export default {
       congControl: "کنترل ازدحام",
       authTimeout: "مهلت احراز هویت",
       hb: "ضربان قلب",
+    },
+    tun: {
+      addr: "آدرس‌ها",
+      ifName: "نام اینترفیس",
     },
     vless: {
       flow: "جریان",
@@ -302,7 +313,7 @@ export default {
     privateIp: "آدرس های IP نامعتبر",
     port: "پورت‌ها",
     portRange: "محدوده‌های پورت",
-    srcIp: "محدوده‌های آدرس IP مبدا",
+    srcCidr: "محدوده‌های آدرس IP مبدا",
     srcPrivateIp: "آدرس‌های IP مبدا نامعتبر",
     srcPort: "پورت‌های مبدا",
     srcPortRange: "محدوده پورتهای منبع",

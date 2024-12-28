@@ -15,7 +15,7 @@ export function fillData(out: any, inbound: Inbound, tlsClient: any) {
   out.server = location.hostname
   out.server_port = inbound.listen_port
   switch(inbound.type){
-    case InTypes.HTTP || InTypes.SOCKS:
+    case InTypes.HTTP: case InTypes.SOCKS: case InTypes.Mixed:
       return
     case InTypes.Shadowsocks:
       shadowsocksOut(out, <Shadowsocks>inbound)
@@ -61,7 +61,6 @@ function addTls(out: any, tls: iTls, tlsClient: oTls){
 
 function shadowsocksOut(out: any, inbound: Shadowsocks) {
   out.method = inbound.method
-  out.multiplex = inbound.multiplex
 }
 
 function shadowTlsOut(out: any, inbound: ShadowTLS) {
@@ -94,16 +93,13 @@ function tuicOut(out: any, inbound: TUIC) {
 }
 
 function vlessOut(out: any, inbound: VLESS) {
-  out.multiplex = inbound.multiplex
   out.transport = inbound.transport
 }
 
 function trojanOut(out: any, inbound: Trojan) {
-  out.multiplex = inbound.multiplex
   out.transport = inbound.transport
 }
 
 function vmessOut(out: any, inbound: VMess) {
-  out.multiplex = inbound.multiplex
   out.transport = inbound.transport
 }

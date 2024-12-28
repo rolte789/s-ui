@@ -27,21 +27,15 @@
     </v-col>
   </v-row>
   <v-row>
-    <v-col cols="12">{{ $t('rule.ruleset') }}</v-col>
+    <v-col class="v-card-subtitle" cols="12">{{ $t('rule.ruleset') }}</v-col>
     <v-col cols="12" sm="4" md="3" lg="2" v-for="(item, index) in <any[]>rulesets" :key="item.tag">
-      <v-card rounded="xl" elevation="5" min-width="200" :title="index+1">
+      <v-card rounded="xl" elevation="5" min-width="200" :title="item.tag">
         <v-card-subtitle style="margin-top: -20px;">
           <v-row>
             <v-col>{{ $t('ruleset.' + item.type) }}</v-col>
           </v-row>
         </v-card-subtitle>
         <v-card-text>
-          <v-row>
-            <v-col>{{ $t('objects.tag') }}</v-col>
-            <v-col dir="ltr">
-              {{ item.tag }}
-            </v-col>
-          </v-row>
           <v-row>
             <v-col>{{ $t('ruleset.format') }}</v-col>
             <v-col dir="ltr">
@@ -84,8 +78,14 @@
     </v-col>
   </v-row>
   <v-row>
-    <v-col cols="12">{{ $t('pages.rules') }}</v-col>
-    <v-col cols="12" sm="4" md="3" lg="2" v-for="(item, index) in <any[]>rules">
+    <v-col class="v-card-subtitle" cols="12">{{ $t('pages.rules') }}</v-col>
+    <v-col cols="12" sm="4" md="3" lg="2" v-for="(item, index) in <any[]>rules"
+        :key="item.id"
+        :draggable="true"
+        @dragstart="onDragStart(index)"
+        @dragover.prevent
+        @drop="onDrop(index)"
+      >
       <v-card rounded="xl" elevation="5" min-width="200" :title="index+1">
         <v-card-subtitle style="margin-top: -20px;">
           <v-row>
@@ -263,4 +263,20 @@ const delRuleset = (index: number) => {
   rulesets.value.splice(index,1)
   delRulesetOverlay.value[index] = false
 }
+
+const draggedItemIndex = ref(null);
+
+const onDragStart = (index: any) => {
+  draggedItemIndex.value = index;
+};
+
+const onDrop = (index: any) => {
+  if (draggedItemIndex.value !== null) {
+    // Swap the dragged item with the dropped one
+    const draggedItem = rules.value[draggedItemIndex.value];
+    rules.value.splice(draggedItemIndex.value, 1);
+    rules.value.splice(index, 0, draggedItem);
+    draggedItemIndex.value = null;
+  }
+};
 </script>

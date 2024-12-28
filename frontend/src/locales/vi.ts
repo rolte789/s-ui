@@ -103,6 +103,7 @@ export default {
     disable: "Vô hiệu hóa",
     close: "Đóng",
     restartApp: "Khởi động lại ứng dụng",
+    restartSb: "Khởi động lại Singbox",
   },
   login: {
     title: "Đăng nhập",
@@ -153,6 +154,7 @@ export default {
     directDns: "DNS Trực tiếp",
     toDirectDns: "Chuyển hướng tới DNS Trực tiếp",
     jsonSubOptions: "Tùy chọn Khác",
+    excludePkg: "Loại trừ Gói",
   },
   client: {
     name: "Tên",
@@ -164,6 +166,11 @@ export default {
     links: "Liên kết",
     external: "Liên kết bên ngoài",
     sub: "Đăng ký bên ngoài",
+  },
+  bulk: {
+    add: "Thêm Hàng loạt",
+    order: "Sắp xếp",
+    random: "Ngẫu nhiên",
   },
   types: {
     un: "Tên người dùng",
@@ -199,6 +206,10 @@ export default {
       congControl: "Kiểm soát Tắc nghẽn",
       authTimeout: "Thời gian chờ Xác thực",
       hb: "Nhịp tim",
+    },
+    tun: {
+      addr: "Địa chỉ",
+      ifName: "Tên Giao diện",
     },
     vless: {
       flow: "Luồng",

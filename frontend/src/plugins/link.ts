@@ -38,7 +38,7 @@ export namespace LinkUtil {
   }
 
   function shadowsocksLink(user: Client, inbound: Shadowsocks, addrs: any[]): string[] {
-    const userPass = user.config.shadowsocks?.password
+    const userPass = inbound.method == "2022-blake3-aes-128-gcm" ? user.config.shadowsocks16?.password : user.config.shadowsocks?.password
     const password = [userPass]
     if (inbound.method.startsWith('2022')) password.push(inbound.password)
     const params = {
@@ -179,7 +179,7 @@ export namespace LinkUtil {
         tfo: inbound.tcp_fast_open? 1 : 0,
         allowInsecure: tlsClient?.insecure ? 1 : null
       }
-      const uri = `http2://${utf8ToBase64(user + ":" + password + "@" + location.hostname + ":" + inbound.listen_port)}`
+      const uri = `http2://${utf8ToBase64(user.name + ":" + password + "@" + location.hostname + ":" + inbound.listen_port)}`
       const paramsArray = []
       for (const [key, value] of Object.entries(params)){
         if (value) {

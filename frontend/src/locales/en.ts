@@ -103,6 +103,7 @@ export default {
     disable: "Disable",
     close: "Close",
     restartApp: "Restart App",
+    restartSb: "Restart Singbox",
   },
   login: {
     title: "Login",
@@ -153,6 +154,7 @@ export default {
     directDns: "Direct DNS",
     toDirectDns: "Route to Direct DNS",
     jsonSubOptions: "Other Options",
+    excludePkg: "Exclude Packages",
   },
   client: {
     name: "Name",
@@ -164,6 +166,11 @@ export default {
     links: "Links",
     external: "External Link",
     sub: "External Subscription",
+  },
+  bulk: {
+    add: "Add Bulk",
+    order: "Order",
+    random: "Random",
   },
   types: {
     un: "Username",
@@ -199,6 +206,10 @@ export default {
       congControl: "Congestion Control",
       authTimeout: "Authentication Timeout",
       hb: "Heartbeat",
+    },
+    tun: {
+      addr: "Addresses",
+      ifName: "Interface Name",
     },
     vless: {
       flow: "Flow",

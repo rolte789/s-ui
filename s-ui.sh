@@ -184,6 +184,7 @@ uninstall() {
     systemctl stop sing-box
     systemctl disable sing-box
     rm /etc/systemd/system/s-ui.service -f
+    rm /etc/systemd/system/sing-box.service -f
     systemctl daemon-reload
     systemctl reset-failed
     rm /etc/s-ui/ -rf
@@ -289,7 +290,7 @@ stop() {
         if [[ $? == 1 ]]; then
             LOGI "${1} stopped successfully"
         else
-            LOGE "Falied to stop ${1}, Probably because the stop time exceeds two seconds, Please check the log information later"
+            LOGE "Failed to stop ${1}, Probably because the stop time exceeds two seconds, Please check the log information later"
         fi
     fi
 
@@ -435,9 +436,9 @@ show_status() {
 show_enable_status() {
     check_enabled $1
     if [[ $? == 0 ]]; then
-        echo -e "Start automatically: ${green}Yes${plain}"
+        echo -e "Start ${1} automatically: ${green}Yes${plain}"
     else
-        echo -e "Start automatically: ${red}No${plain}"
+        echo -e "Start ${1} automatically: ${red}No${plain}"
     fi
 }
 

@@ -41,6 +41,7 @@
               <Naive v-if="inbound.type == inTypes.Naive" :inbound="inbound" />
               <ShadowTls v-if="inbound.type == inTypes.ShadowTLS" direction="in" :data="inbound" :outTags="outTags" />
               <Tuic v-if="inbound.type == inTypes.TUIC" direction="in" :data="inbound" />
+              <Tun v-if="inbound.type == inTypes.Tun" :data="inbound" />
               <TProxy v-if="inbound.type == inTypes.TProxy" :inbound="inbound" />
               <Transport v-if="Object.hasOwn(inbound,'transport')" :data="inbound" />
               <Users v-if="HasOptionalUser.includes(inbound.type)" :inbound="inbound" />
@@ -50,6 +51,7 @@
             </v-window-item>
             <v-window-item value="c">
               <OutJsonVue :inData="inData" :type="inbound.type" />
+              <Multiplex v-if="Object.hasOwn(inbound,'multiplex')" direction="out" :data="inData.outJson" />
               <v-card>
                 <v-card-subtitle>{{ $t('in.multiDomain') }}
                   <v-icon @click="add_addr" icon="mdi-plus"></v-icon>
@@ -100,6 +102,7 @@ import Hysteria2 from '@/components/protocols/Hysteria2.vue'
 import Naive from '@/components/protocols/Naive.vue'
 import ShadowTls from '@/components/protocols/ShadowTls.vue'
 import Tuic from '@/components/protocols/Tuic.vue'
+import Tun from '@/components/protocols/Tun.vue'
 import InTls from '@/components/tls/InTLS.vue'
 import TProxy from '@/components/protocols/TProxy.vue'
 import Multiplex from '@/components/Multiplex.vue'
@@ -123,6 +126,7 @@ export default {
       HasInData: [
         InTypes.SOCKS,
         InTypes.HTTP,
+        InTypes.Mixed,
         InTypes.Shadowsocks,
         InTypes.VMess,
         InTypes.ShadowTLS,
@@ -163,12 +167,15 @@ export default {
       this.side = "s"
     },
     changeType() {
-      // Tag change only in add outbound
+      if (!this.inbound.listen_port) this.inbound.listen_port = RandomUtil.randomIntRange(10000, 60000)
+      // Tag change only in add inbound
       const tag = this.$props.index != -1 ? this.inbound.tag : this.inbound.type + "-" + this.inbound.listen_port
       // Use previous data
-      const prevConfig = { tag: tag ,listen: this.inbound.listen, listen_port: this.inbound.listen_port }
-      this.inbound = createInbound(this.inbound.type, prevConfig)
+      const prevConfig = { tag: tag ,listen: this.inbound.listen?? "::", listen_port: this.inbound.listen_port }
+      this.inbound = createInbound(this.inbound.type, this.inbound.type != this.inTypes.Tun ? prevConfig : { tag: tag })
       if (this.HasInData.includes(this.inbound.type)){
+        if (this.inData.id == -1) this.inData.id = 0
+        this.inData.addrs = []
         this.inData.outJson = {}
         this.inData.tag = tag
       } else {
@@ -199,7 +206,7 @@ export default {
   },
   components: {
     Listen, InTls, Hysteria2, Naive, Direct, Shadowsocks,
-    Users, Hysteria, ShadowTls, TProxy, Multiplex, Tuic, Transport,
+    Users, Hysteria, ShadowTls, TProxy, Multiplex, Tuic, Tun, Transport,
     AddrVue, OutJsonVue
   }
 }
